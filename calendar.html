@@ -2,7 +2,11 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
   <title>月曆｜My Planner</title>
 
   <style>
@@ -14,7 +18,7 @@
 
     :root {
       --bg: #f4f5f9;
-      --card: #fff;
+      --card: #ffffff;
       --text: #121827;
       --muted: #9aa2b2;
       --primary: #7165df;
@@ -23,8 +27,14 @@
       --shadow: 0 16px 36px rgba(42, 50, 75, 0.08);
     }
 
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
       font-family: "Microsoft JhengHei", Arial, sans-serif;
       color: var(--text);
       background: var(--bg);
@@ -33,11 +43,27 @@
     button,
     input,
     textarea {
+      max-width: 100%;
       font: inherit;
     }
 
     button {
       cursor: pointer;
+    }
+
+    input,
+    textarea {
+      min-width: 0;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="date"],
+    input[type="time"] {
+      width: 100%;
+      min-width: 0;
+      padding: 0 12px;
+      font-size: 16px;
     }
 
     .app {
@@ -52,7 +78,7 @@
 
     .topbar {
       display: grid;
-      grid-template-columns: 48px 1fr 60px;
+      grid-template-columns: 48px minmax(0, 1fr) 60px;
       align-items: center;
       margin-bottom: 28px;
     }
@@ -88,12 +114,13 @@
       font-weight: 700;
     }
 
-    /* 月份列 */
+    /* 月份切換 */
 
     .monthbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
       margin-bottom: 18px;
     }
 
@@ -103,6 +130,7 @@
 
     .month-nav {
       display: flex;
+      flex-shrink: 0;
       gap: 10px;
     }
 
@@ -116,6 +144,8 @@
     /* 月曆 */
 
     .calendar {
+      width: 100%;
+      overflow: hidden;
       padding: 24px 20px;
       border-radius: 28px;
       background: var(--card);
@@ -125,7 +155,7 @@
     .weekdays,
     .days {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(7, minmax(0, 1fr));
     }
 
     .weekdays {
@@ -133,6 +163,7 @@
     }
 
     .weekday {
+      min-width: 0;
       padding: 8px 0;
       color: #858d9d;
       text-align: center;
@@ -153,6 +184,7 @@
       position: relative;
       display: grid;
       width: 100%;
+      min-width: 0;
       min-height: 64px;
       place-items: center;
       border: 0;
@@ -171,7 +203,7 @@
     }
 
     .day.selected {
-      color: #fff;
+      color: #ffffff;
       background: var(--primary);
       box-shadow: 0 9px 20px rgba(113, 101, 223, 0.32);
     }
@@ -187,7 +219,7 @@
     }
 
     .day.selected.has-event::after {
-      background: #fff;
+      background: #ffffff;
     }
 
     /* 事件區 */
@@ -200,19 +232,22 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       margin-bottom: 14px;
     }
 
     .events-heading h2 {
+      min-width: 0;
       font-size: 1.15rem;
     }
 
     .add {
       min-height: 44px;
+      flex-shrink: 0;
       padding: 0 16px;
       border: 0;
       border-radius: 14px;
-      color: #fff;
+      color: #ffffff;
       background: var(--primary);
       font-weight: 700;
     }
@@ -230,7 +265,7 @@
     }
 
     .empty {
-      padding: 32px;
+      padding: 32px 18px;
       color: var(--muted);
       text-align: center;
     }
@@ -274,18 +309,22 @@
       overflow-wrap: anywhere;
     }
 
+    /* 編輯、刪除上下排列 */
+
     .actions {
       display: flex;
       flex-shrink: 0;
+      flex-direction: column;
       gap: 7px;
     }
 
     .edit,
     .delete {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 38px;
       border: 0;
       border-radius: 12px;
+      font-size: 0.78rem;
       font-weight: 700;
     }
 
@@ -299,7 +338,7 @@
       background: #ffedef;
     }
 
-    /* 彈出視窗 */
+    /* 新增／編輯事件視窗 */
 
     .overlay {
       position: fixed;
@@ -308,8 +347,11 @@
       display: none;
       align-items: flex-end;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
+      overflow-x: hidden;
+      overflow-y: auto;
       background: rgba(20, 25, 38, 0.45);
+      overscroll-behavior: contain;
     }
 
     .overlay.show {
@@ -319,28 +361,36 @@
     .modal {
       width: 100%;
       max-width: 620px;
+      max-height: calc(100dvh - 24px);
       padding: 24px;
+      overflow-x: hidden;
+      overflow-y: auto;
       border-radius: 26px;
-      background: #fff;
+      background: #ffffff;
+      -webkit-overflow-scrolling: touch;
     }
 
     .modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
       margin-bottom: 20px;
     }
 
     .close {
       width: 38px;
       height: 38px;
+      flex-shrink: 0;
       border: 0;
       border-radius: 12px;
+      color: #4c83e7;
       background: #f1f2f6;
       font-size: 1.2rem;
     }
 
     .field {
+      min-width: 0;
       margin-bottom: 15px;
     }
 
@@ -354,11 +404,13 @@
 
     input,
     textarea {
+      display: block;
       width: 100%;
       border: 1px solid #dfe3eb;
       border-radius: 13px;
       outline: 0;
       background: #fbfcfe;
+      font-size: 16px;
     }
 
     input {
@@ -380,7 +432,9 @@
 
     .form-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
       gap: 12px;
     }
 
@@ -389,14 +443,33 @@
       height: 49px;
       border: 0;
       border-radius: 14px;
-      color: #fff;
+      color: #ffffff;
       background: var(--primary);
+      font-size: 1rem;
       font-weight: 800;
     }
 
+    /* 手機版 */
+
     @media (max-width: 520px) {
       .app {
-        padding: 20px 12px 40px;
+        padding:
+          max(20px, env(safe-area-inset-top))
+          12px
+          calc(40px + env(safe-area-inset-bottom));
+      }
+
+      .topbar {
+        grid-template-columns: 44px minmax(0, 1fr) 56px;
+        margin-bottom: 24px;
+      }
+
+      .topbar h1 {
+        font-size: 1.45rem;
+      }
+
+      .monthbar h2 {
+        font-size: 1.3rem;
       }
 
       .calendar {
@@ -404,8 +477,13 @@
         border-radius: 23px;
       }
 
+      .days {
+        row-gap: 5px;
+      }
+
       .day {
-        min-height: 53px;
+        min-height: 50px;
+        border-radius: 13px;
         font-size: 0.82rem;
       }
 
@@ -414,15 +492,53 @@
         padding: 14px 12px;
       }
 
+      .actions {
+        flex-direction: column;
+      }
+
       .edit,
       .delete {
-        width: 36px;
+        width: 42px;
         height: 36px;
-        font-size: 0.8rem;
+        font-size: 0.72rem;
       }
 
       .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+      }
+
+      .modal {
+        max-height: calc(100dvh - 24px);
+        padding: 22px 18px;
+        border-radius: 24px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .events-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .add {
+        width: 100%;
+      }
+
+      .calendar {
+        padding-right: 5px;
+        padding-left: 5px;
+      }
+
+      .day {
+        min-height: 45px;
+        font-size: 0.76rem;
       }
     }
   </style>
@@ -432,17 +548,46 @@
   <main class="app">
 
     <header class="topbar">
-      <a class="back" href="index.html" aria-label="回首頁">‹</a>
+      <a
+        class="back"
+        href="index.html"
+        aria-label="回首頁"
+      >
+        ‹
+      </a>
+
       <h1>月曆</h1>
-      <button class="today" id="todayBtn" type="button">今天</button>
+
+      <button
+        class="today"
+        id="todayBtn"
+        type="button"
+      >
+        今天
+      </button>
     </header>
 
     <section class="monthbar">
       <h2 id="monthTitle"></h2>
 
       <div class="month-nav">
-        <button class="nav" id="prevBtn" type="button">‹</button>
-        <button class="nav" id="nextBtn" type="button">›</button>
+        <button
+          class="nav"
+          id="prevBtn"
+          type="button"
+          aria-label="上一個月"
+        >
+          ‹
+        </button>
+
+        <button
+          class="nav"
+          id="nextBtn"
+          type="button"
+          aria-label="下一個月"
+        >
+          ›
+        </button>
       </div>
     </section>
 
@@ -457,51 +602,103 @@
         <div class="weekday">六</div>
       </div>
 
-      <div class="days" id="days"></div>
+      <div
+        class="days"
+        id="days"
+      ></div>
     </section>
 
     <section class="events-section">
       <div class="events-heading">
         <h2 id="dateTitle"></h2>
-        <button class="add" id="addBtn" type="button">＋新增事件</button>
+
+        <button
+          class="add"
+          id="addBtn"
+          type="button"
+        >
+          ＋新增事件
+        </button>
       </div>
 
-      <div class="event-list" id="eventList"></div>
+      <div
+        class="event-list"
+        id="eventList"
+      ></div>
     </section>
 
   </main>
 
-  <div class="overlay" id="overlay">
-    <section class="modal">
+  <div
+    class="overlay"
+    id="overlay"
+  >
+    <section
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
       <div class="modal-header">
         <h2 id="modalTitle">新增事件</h2>
-        <button class="close" id="closeBtn" type="button">×</button>
+
+        <button
+          class="close"
+          id="closeBtn"
+          type="button"
+          aria-label="關閉"
+        >
+          ×
+        </button>
       </div>
 
       <form id="eventForm">
         <div class="field">
           <label for="name">事件名稱</label>
-          <input id="name" type="text" maxlength="60" required>
+
+          <input
+            id="name"
+            type="text"
+            maxlength="60"
+            required
+          >
         </div>
 
         <div class="form-row">
           <div class="field">
             <label for="date">日期</label>
-            <input id="date" type="date" required>
+
+            <input
+              id="date"
+              type="date"
+              required
+            >
           </div>
 
           <div class="field">
             <label for="time">時間</label>
-            <input id="time" type="time">
+
+            <input
+              id="time"
+              type="time"
+            >
           </div>
         </div>
 
         <div class="field">
           <label for="note">備註</label>
-          <textarea id="note" maxlength="300"></textarea>
+
+          <textarea
+            id="note"
+            maxlength="300"
+          ></textarea>
         </div>
 
-        <button class="save" id="saveBtn" type="submit">
+        <button
+          class="save"
+          id="saveBtn"
+          type="submit"
+        >
           儲存事件
         </button>
       </form>
@@ -512,25 +709,50 @@
     const $ = id => document.getElementById(id);
 
     const today = new Date();
-    let viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    let viewDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
     let selectedDate = dateKey(today);
     let editingId = null;
     let editingDate = null;
 
-    let events = JSON.parse(
-      localStorage.getItem("myPlannerEvents") || "{}"
-    );
+    let events;
+
+    try {
+      events = JSON.parse(
+        localStorage.getItem("myPlannerEvents") || "{}"
+      );
+    } catch {
+      events = {};
+    }
 
     function dateKey(date) {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
+      const year = date.getFullYear();
+
+      const month = String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+
+      const day = String(
+        date.getDate()
+      ).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
     }
 
     function keyToDate(key) {
-      const [y, m, d] = key.split("-").map(Number);
-      return new Date(y, m - 1, d);
+      const [year, month, day] =
+        key.split("-").map(Number);
+
+      return new Date(
+        year,
+        month - 1,
+        day
+      );
     }
 
     function saveEvents() {
@@ -546,17 +768,30 @@
       const year = viewDate.getFullYear();
       const month = viewDate.getMonth();
 
-      $("monthTitle").textContent = `${year} 年 ${month + 1} 月`;
+      $("monthTitle").textContent =
+        `${year} 年 ${month + 1} 月`;
 
-      const firstWeekday = new Date(year, month, 1).getDay();
-      const start = new Date(year, month, 1 - firstWeekday);
+      const firstWeekday =
+        new Date(year, month, 1).getDay();
+
+      const start =
+        new Date(
+          year,
+          month,
+          1 - firstWeekday
+        );
 
       for (let i = 0; i < 42; i++) {
         const date = new Date(start);
-        date.setDate(start.getDate() + i);
+
+        date.setDate(
+          start.getDate() + i
+        );
 
         const key = dateKey(date);
-        const button = document.createElement("button");
+
+        const button =
+          document.createElement("button");
 
         button.type = "button";
         button.className = "day";
@@ -576,6 +811,7 @@
 
         button.onclick = () => {
           selectedDate = key;
+
           viewDate = new Date(
             date.getFullYear(),
             date.getMonth(),
@@ -596,53 +832,92 @@
       $("dateTitle").textContent =
         `${date.getMonth() + 1} 月 ${date.getDate()} 日事件`;
 
-      const list = [...(events[selectedDate] || [])]
-        .sort((a, b) =>
-          (a.time || "99:99").localeCompare(b.time || "99:99")
-        );
+      const list =
+        [...(events[selectedDate] || [])]
+          .sort((a, b) =>
+            (a.time || "99:99").localeCompare(
+              b.time || "99:99"
+            )
+          );
 
       $("eventList").innerHTML = "";
 
       if (!list.length) {
         $("eventList").innerHTML =
           `<div class="empty">這一天目前沒有事件</div>`;
+
         return;
       }
 
       list.forEach(event => {
-        const item = document.createElement("article");
+        const item =
+          document.createElement("article");
+
         item.className = "event";
 
         item.innerHTML = `
           <div class="event-line"></div>
 
           <div class="event-content">
-            <div class="event-time">${event.time || "全天"}</div>
+            <div class="event-time">
+              ${event.time || "全天"}
+            </div>
+
             <div class="event-name"></div>
-            ${event.note ? `<p class="event-note"></p>` : ""}
+
+            ${
+              event.note
+                ? `<p class="event-note"></p>`
+                : ""
+            }
           </div>
 
           <div class="actions">
-            <button class="edit" type="button">編輯</button>
-            <button class="delete" type="button">刪除</button>
+            <button
+              class="edit"
+              type="button"
+            >
+              編輯
+            </button>
+
+            <button
+              class="delete"
+              type="button"
+            >
+              刪除
+            </button>
           </div>
         `;
 
-        item.querySelector(".event-name").textContent = event.name;
+        item.querySelector(
+          ".event-name"
+        ).textContent = event.name;
 
         if (event.note) {
-          item.querySelector(".event-note").textContent = event.note;
+          item.querySelector(
+            ".event-note"
+          ).textContent = event.note;
         }
 
-        item.querySelector(".edit").onclick = () => {
+        item.querySelector(
+          ".edit"
+        ).onclick = () => {
           openEdit(event);
         };
 
-        item.querySelector(".delete").onclick = () => {
-          if (!confirm("確定要刪除這個事件嗎？")) return;
+        item.querySelector(
+          ".delete"
+        ).onclick = () => {
+          if (
+            !confirm("確定要刪除這個事件嗎？")
+          ) {
+            return;
+          }
 
-          events[selectedDate] = events[selectedDate]
-            .filter(item => item.id !== event.id);
+          events[selectedDate] =
+            events[selectedDate].filter(
+              item => item.id !== event.id
+            );
 
           if (!events[selectedDate].length) {
             delete events[selectedDate];
@@ -657,51 +932,98 @@
       });
     }
 
+    function lockPage() {
+      document.body.style.overflow = "hidden";
+    }
+
+    function unlockPage() {
+      document.body.style.overflow = "";
+    }
+
     function openAdd() {
       editingId = null;
       editingDate = null;
 
-      $("modalTitle").textContent = "新增事件";
-      $("saveBtn").textContent = "儲存事件";
+      $("modalTitle").textContent =
+        "新增事件";
+
+      $("saveBtn").textContent =
+        "儲存事件";
+
       $("name").value = "";
       $("date").value = selectedDate;
       $("time").value = "";
       $("note").value = "";
 
       $("overlay").classList.add("show");
+
+      lockPage();
+
+      setTimeout(() => {
+        $("name").focus();
+      }, 100);
     }
 
     function openEdit(event) {
       editingId = event.id;
       editingDate = selectedDate;
 
-      $("modalTitle").textContent = "編輯事件";
-      $("saveBtn").textContent = "更新事件";
-      $("name").value = event.name;
-      $("date").value = selectedDate;
-      $("time").value = event.time || "";
-      $("note").value = event.note || "";
+      $("modalTitle").textContent =
+        "編輯事件";
+
+      $("saveBtn").textContent =
+        "更新事件";
+
+      $("name").value =
+        event.name;
+
+      $("date").value =
+        selectedDate;
+
+      $("time").value =
+        event.time || "";
+
+      $("note").value =
+        event.note || "";
 
       $("overlay").classList.add("show");
+
+      lockPage();
+
+      setTimeout(() => {
+        $("name").focus();
+      }, 100);
     }
 
     function closeModal() {
       $("overlay").classList.remove("show");
+      unlockPage();
     }
 
     $("eventForm").onsubmit = event => {
       event.preventDefault();
 
-      const name = $("name").value.trim();
-      const newDate = $("date").value;
-      const time = $("time").value;
-      const note = $("note").value.trim();
+      const name =
+        $("name").value.trim();
 
-      if (!name || !newDate) return;
+      const newDate =
+        $("date").value;
+
+      const time =
+        $("time").value;
+
+      const note =
+        $("note").value.trim();
+
+      if (!name || !newDate) {
+        return;
+      }
 
       if (editingId) {
-        events[editingDate] = events[editingDate]
-          .filter(event => event.id !== editingId);
+        events[editingDate] =
+          (events[editingDate] || []).filter(
+            event => event.id !== editingId
+          );
 
         if (!events[editingDate].length) {
           delete events[editingDate];
@@ -713,7 +1035,9 @@
       }
 
       events[newDate].push({
-        id: editingId || `${Date.now()}-${Math.random()}`,
+        id:
+          editingId ||
+          `${Date.now()}-${Math.random()}`,
         name,
         time,
         note
@@ -721,8 +1045,14 @@
 
       selectedDate = newDate;
 
-      const date = keyToDate(newDate);
-      viewDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      const date =
+        keyToDate(newDate);
+
+      viewDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        1
+      );
 
       saveEvents();
       closeModal();
@@ -751,7 +1081,9 @@
     };
 
     $("todayBtn").onclick = () => {
-      selectedDate = dateKey(today);
+      selectedDate =
+        dateKey(today);
+
       viewDate = new Date(
         today.getFullYear(),
         today.getMonth(),
@@ -762,14 +1094,26 @@
       renderEvents();
     };
 
-    $("addBtn").onclick = openAdd;
-    $("closeBtn").onclick = closeModal;
+    $("addBtn").onclick =
+      openAdd;
+
+    $("closeBtn").onclick =
+      closeModal;
 
     $("overlay").onclick = event => {
       if (event.target === $("overlay")) {
         closeModal();
       }
     };
+
+    document.addEventListener(
+      "keydown",
+      event => {
+        if (event.key === "Escape") {
+          closeModal();
+        }
+      }
+    );
 
     renderCalendar();
     renderEvents();
