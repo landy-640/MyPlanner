@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>手機月曆</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --card: #ffffff;
+      --text: #202124;
+      --muted: #8a8f98;
+      --line: #eceef1;
+      --primary: #4f6df5;
+      --primary-soft: #eef1ff;
+      --danger: #ef6b6b;
+      --shadow: 0 12px 30px rgba(32, 33, 36, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang TC", "Noto Sans TC", sans-serif;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px 16px 32px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    .today-button {
+      border: 0;
+      border-radius: 12px;
+      padding: 9px 14px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calendar-card,
+    .schedule-card {
+      background: var(--card);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .calendar-card {
+      padding: 20px 16px 18px;
+    }
+
+    .month-header {
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .month-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .nav-button {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      background: #f6f7f9;
+      color: var(--text);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .weekdays,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+    }
+
+    .weekdays {
+      margin-bottom: 8px;
+    }
+
+    .weekday {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .weekday:first-child,
+    .weekday:last-child {
+      color: var(--danger);
+    }
+
+    .day {
+      position: relative;
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .day.muted {
+      color: #c6c9cf;
+    }
+
+    .day.today {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .day.selected {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 7px 14px rgba(79, 109, 245, 0.28);
+    }
+
+    .day.has-event::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--primary);
+      transform: translateX(-50%);
+    }
+
+    .day.selected.has-event::after {
+      background: #fff;
+    }
+
+    .schedule-card {
+      margin-top: 18px;
+      padding: 20px;
+    }
+
+    .schedule-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .schedule-title h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+
+    .schedule-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .add-button {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .event-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .event-item {
+      display: grid;
+      grid-template-columns: 4px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 14px;
+      border-radius: 15px;
+      background: #f8f9fb;
+    }
+
+    .event-bar {
+      align-self: stretch;
+      border-radius: 99px;
+      background: var(--primary);
+    }
+
+    .event-item:nth-child(2) .event-bar {
+      background: #ef9a62;
+    }
+
+    .event-name {
+      margin: 0 0 3px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .event-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .event-time {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .empty-state {
+      padding: 22px 0 8px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (min-width: 600px) {
+      body {
+        padding: 20px 0;
+      }
+
+      .app {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1>我的月曆</h1>
+      <button class="today-button" id="todayBtn">今天</button>
+    </header>
+
+    <section class="calendar-card">
+      <div class="month-header">
+        <button class="nav-button" id="prevBtn" aria-label="上一個月">‹</button>
+        <div class="month-title" id="monthTitle"></div>
+        <button class="nav-button" id="nextBtn" aria-label="下一個月">›</button>
+      </div>
+
+      <div class="weekdays">
+        <div class="weekday">日</div>
+        <div class="weekday">一</div>
+        <div class="weekday">二</div>
+        <div class="weekday">三</div>
+        <div class="weekday">四</div>
+        <div class="weekday">五</div>
+        <div class="weekday">六</div>
+      </div>
+
+      <div class="days" id="calendarDays"></div>
+    </section>
+
+    <section class="schedule-card">
+      <div class="schedule-title">
+        <div>
+          <h2 id="selectedDateTitle">今日行程</h2>
+          <p id="selectedDateText"></p>
+        </div>
+        <button class="add-button" aria-label="新增行程">+</button>
+      </div>
+
+      <div class="event-list" id="eventList"></div>
+    </section>
+  </main>
+
+  <script>
+    const monthTitle = document.getElementById("monthTitle");
+    const calendarDays = document.getElementById("calendarDays");
+    const selectedDateTitle = document.getElementById("selectedDateTitle");
+    const selectedDateText = document.getElementById("selectedDateText");
+    const eventList = document.getElementById("eventList");
+
+    const now = new Date();
+    let viewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    let selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const events = {
+      [`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`]: [
+        { name: "專案討論", note: "線上會議", time: "10:00" },
+        { name: "運動時間", note: "健身房", time: "18:30" }
+      ],
+      [`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate() + 3}`]: [
+        { name: "繳交報告", note: "課程作業", time: "23:59" }
+      ]
+    };
+
+    function dateKey(date) {
+      return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    }
+
+    function sameDate(a, b) {
+      return (
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate()
+      );
+    }
+
+    function renderCalendar() {
+      calendarDays.innerHTML = "";
+
+      const year = viewDate.getFullYear();
+      const month = viewDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const startDay = firstDay.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+      monthTitle.textContent = `${year} 年 ${month + 1} 月`;
+
+      for (let i = startDay - 1; i >= 0; i--) {
+        const date = new Date(year, month - 1, daysInPrevMonth - i);
+        calendarDays.appendChild(createDayButton(date, true));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        calendarDays.appendChild(createDayButton(date, false));
+      }
+
+      const totalCells = calendarDays.children.length;
+      const remaining = totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
+
+      for (let day = 1; day <= remaining; day++) {
+        const date = new Date(year, month + 1, day);
+        calendarDays.appendChild(createDayButton(date, true));
+      }
+
+      renderEvents();
+    }
+
+    function createDayButton(date, muted) {
+      const button = document.createElement("button");
+      button.className = "day";
+      button.textContent = date.getDate();
+
+      if (muted) button.classList.add("muted");
+      if (sameDate(date, now)) button.classList.add("today");
+      if (sameDate(date, selectedDate)) button.classList.add("selected");
+      if (events[dateKey(date)]) button.classList.add("has-event");
+
+      button.addEventListener("click", () => {
+        selectedDate = new Date(date);
+        viewDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        renderCalendar();
+      });
+
+      return button;
+    }
+
+    function renderEvents() {
+      const selectedEvents = events[dateKey(selectedDate)] || [];
+      const weekday = ["日", "一", "二", "三", "四", "五", "六"];
+
+      selectedDateTitle.textContent = sameDate(selectedDate, now)
+        ? "今日行程"
+        : `${selectedDate.getMonth() + 1} 月 ${selectedDate.getDate()} 日`;
+
+      selectedDateText.textContent =
+        `${selectedDate.getFullYear()} 年，星期${weekday[selectedDate.getDay()]}`;
+
+      if (selectedEvents.length === 0) {
+        eventList.innerHTML = '<div class="empty-state">這一天目前沒有行程</div>';
+        return;
+      }
+
+      eventList.innerHTML = selectedEvents
+        .map(
+          event => `
+            <article class="event-item">
+              <div class="event-bar"></div>
+              <div>
+                <p class="event-name">${event.name}</p>
+                <p class="event-note">${event.note}</p>
+              </div>
+              <div class="event-time">${event.time}</div>
+            </article>
+          `
+        )
+        .join("");
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1);
+      renderCalendar();
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    document.getElementById("todayBtn").addEventListener("click", () => {
+      selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      viewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      renderCalendar();
+    });
+
+    renderCalendar();
+  </script>
+</body>
+</html>
