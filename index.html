@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
 
-    <!-- 讓手機版面按照裝置寬度顯示 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>My Planner</title>
 
     <style>
-        /* 基本設定 */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -24,12 +25,11 @@
                 Arial,
                 sans-serif;
             color: #202838;
-            background:
-                linear-gradient(
-                    180deg,
-                    #fbfcff 0%,
-                    #f5f7fa 100%
-                );
+            background: linear-gradient(
+                180deg,
+                #fbfcff 0%,
+                #f5f7fa 100%
+            );
         }
 
         a {
@@ -37,7 +37,6 @@
             text-decoration: none;
         }
 
-        /* 整個首頁容器 */
         .app {
             width: 100%;
             max-width: 760px;
@@ -47,6 +46,7 @@
         }
 
         /* 頁首 */
+
         .header {
             margin-bottom: 34px;
         }
@@ -64,18 +64,11 @@
             letter-spacing: -2px;
         }
 
-        .subtitle {
-            margin-top: 18px;
-            color: #697181;
-            font-size: 1rem;
-            line-height: 1.7;
-        }
-
         .date-box {
             flex-shrink: 0;
             padding-top: 6px;
-            text-align: right;
             color: #5e6776;
+            text-align: right;
         }
 
         .date {
@@ -89,6 +82,7 @@
         }
 
         /* 六格功能區 */
+
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -97,13 +91,16 @@
 
         .menu-card {
             position: relative;
-            min-height: 225px;
+            display: flex;
+            min-height: 190px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            padding: 28px 22px 24px;
+            padding: 24px 20px;
             border: 1px solid rgba(50, 60, 80, 0.08);
             border-radius: 28px;
-            box-shadow:
-                0 12px 30px rgba(44, 55, 78, 0.06);
+            box-shadow: 0 12px 30px rgba(44, 55, 78, 0.06);
             transition:
                 transform 0.2s ease,
                 box-shadow 0.2s ease;
@@ -111,8 +108,7 @@
 
         .menu-card:hover {
             transform: translateY(-4px);
-            box-shadow:
-                0 18px 38px rgba(44, 55, 78, 0.1);
+            box-shadow: 0 18px 38px rgba(44, 55, 78, 0.1);
         }
 
         .menu-card:active {
@@ -121,40 +117,33 @@
 
         .icon-wrap {
             display: flex;
+            width: 78px;
+            height: 78px;
             align-items: center;
             justify-content: center;
-            width: 82px;
-            height: 82px;
-            margin: 0 auto 24px;
+            margin-bottom: 18px;
             border-radius: 50%;
-            font-size: 2.4rem;
+            font-size: 2.3rem;
         }
 
         .menu-card h2 {
             text-align: center;
-            font-size: 1.35rem;
+            font-size: 1.4rem;
+            font-weight: 700;
             line-height: 1.3;
-        }
-
-        .menu-card p {
-            margin-top: 10px;
-            padding: 0 12px;
-            color: #6e7683;
-            text-align: center;
-            font-size: 0.92rem;
-            line-height: 1.55;
         }
 
         .arrow {
             position: absolute;
             right: 20px;
-            bottom: 18px;
+            bottom: 16px;
             color: #606978;
             font-size: 1.7rem;
             line-height: 1;
         }
 
-        /* 六張卡片的淡色背景 */
+        /* 卡片顏色 */
+
         .calendar-card {
             background: #faf8ff;
         }
@@ -203,7 +192,8 @@
             background: #ebe8ff;
         }
 
-        /* 手機較窄時稍微縮小 */
+        /* 手機版 */
+
         @media (max-width: 520px) {
             .app {
                 padding: 36px 16px 28px;
@@ -222,15 +212,6 @@
                 letter-spacing: -1px;
             }
 
-            .subtitle {
-                margin-top: 13px;
-                font-size: 0.9rem;
-            }
-
-            .date-box {
-                font-size: 0.8rem;
-            }
-
             .date,
             .weekday {
                 font-size: 0.78rem;
@@ -241,39 +222,33 @@
             }
 
             .menu-card {
-                min-height: 190px;
-                padding: 22px 12px 20px;
+                min-height: 165px;
+                padding: 20px 12px;
                 border-radius: 22px;
             }
 
             .icon-wrap {
-                width: 68px;
-                height: 68px;
-                margin-bottom: 18px;
-                font-size: 2rem;
+                width: 66px;
+                height: 66px;
+                margin-bottom: 14px;
+                font-size: 1.9rem;
             }
 
             .menu-card h2 {
                 font-size: 1.08rem;
             }
 
-            .menu-card p {
-                padding: 0;
-                font-size: 0.76rem;
-            }
-
             .arrow {
                 right: 14px;
-                bottom: 12px;
+                bottom: 11px;
                 font-size: 1.35rem;
             }
         }
 
-        /* 非常窄的手機仍維持兩欄 */
         @media (max-width: 360px) {
             .app {
-                padding-left: 12px;
                 padding-right: 12px;
+                padding-left: 12px;
             }
 
             .title {
@@ -281,11 +256,17 @@
             }
 
             .menu-card {
-                min-height: 175px;
+                min-height: 150px;
             }
 
-            .menu-card p {
-                display: none;
+            .icon-wrap {
+                width: 58px;
+                height: 58px;
+                font-size: 1.7rem;
+            }
+
+            .menu-card h2 {
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -294,24 +275,19 @@
 <body>
     <main class="app">
 
-        <!-- 首頁標題 -->
         <header class="header">
             <div class="header-top">
-                <div>
-                    <h1 class="title">My Planner</h1>
-                    <p class="subtitle">
-                        把想做的事，慢慢變成日常。
-                    </p>
-                </div>
+
+                <h1 class="title">My Planner</h1>
 
                 <div class="date-box">
                     <div class="date" id="currentDate"></div>
                     <div class="weekday" id="currentWeekday"></div>
                 </div>
+
             </div>
         </header>
 
-        <!-- 六格功能入口 -->
         <section class="menu-grid">
 
             <!-- 左上：月曆 -->
@@ -322,7 +298,6 @@
             >
                 <div class="icon-wrap">📅</div>
                 <h2>月曆</h2>
-                <p>查看日期與行程</p>
                 <span class="arrow">›</span>
             </a>
 
@@ -334,7 +309,6 @@
             >
                 <div class="icon-wrap">📋</div>
                 <h2>月規劃</h2>
-                <p>規劃整月的目標與計畫</p>
                 <span class="arrow">›</span>
             </a>
 
@@ -346,7 +320,6 @@
             >
                 <div class="icon-wrap">✅</div>
                 <h2>To Do List</h2>
-                <p>整理每日待辦事項</p>
                 <span class="arrow">›</span>
             </a>
 
@@ -358,7 +331,6 @@
             >
                 <div class="icon-wrap">🕒</div>
                 <h2>今日行程</h2>
-                <p>安排今天的時間</p>
                 <span class="arrow">›</span>
             </a>
 
@@ -370,7 +342,6 @@
             >
                 <div class="icon-wrap">📖</div>
                 <h2>讀書規劃</h2>
-                <p>安排讀書計畫與進度</p>
                 <span class="arrow">›</span>
             </a>
 
@@ -382,7 +353,6 @@
             >
                 <div class="icon-wrap">🎓</div>
                 <h2>研究所進度</h2>
-                <p>追蹤研究與重要里程碑</p>
                 <span class="arrow">›</span>
             </a>
 
@@ -390,7 +360,6 @@
     </main>
 
     <script>
-        // 自動顯示今天日期
         const now = new Date();
 
         const dateFormatter = new Intl.DateTimeFormat("zh-TW", {
