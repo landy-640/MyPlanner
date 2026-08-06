@@ -2,11 +2,412 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+
+    <!-- 讓手機版面按照裝置寬度顯示 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>My Planner</title>
+
+    <style>
+        /* 基本設定 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family:
+                "Noto Sans TC",
+                "Microsoft JhengHei",
+                Arial,
+                sans-serif;
+            color: #202838;
+            background:
+                linear-gradient(
+                    180deg,
+                    #fbfcff 0%,
+                    #f5f7fa 100%
+                );
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* 整個首頁容器 */
+        .app {
+            width: 100%;
+            max-width: 760px;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 52px 24px 40px;
+        }
+
+        /* 頁首 */
+        .header {
+            margin-bottom: 34px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .title {
+            font-size: clamp(2.4rem, 9vw, 4.2rem);
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            margin-top: 18px;
+            color: #697181;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .date-box {
+            flex-shrink: 0;
+            padding-top: 6px;
+            text-align: right;
+            color: #5e6776;
+        }
+
+        .date {
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .weekday {
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* 六格功能區 */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .menu-card {
+            position: relative;
+            min-height: 225px;
+            overflow: hidden;
+            padding: 28px 22px 24px;
+            border: 1px solid rgba(50, 60, 80, 0.08);
+            border-radius: 28px;
+            box-shadow:
+                0 12px 30px rgba(44, 55, 78, 0.06);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 18px 38px rgba(44, 55, 78, 0.1);
+        }
+
+        .menu-card:active {
+            transform: scale(0.98);
+        }
+
+        .icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 82px;
+            height: 82px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            font-size: 2.4rem;
+        }
+
+        .menu-card h2 {
+            text-align: center;
+            font-size: 1.35rem;
+            line-height: 1.3;
+        }
+
+        .menu-card p {
+            margin-top: 10px;
+            padding: 0 12px;
+            color: #6e7683;
+            text-align: center;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .arrow {
+            position: absolute;
+            right: 20px;
+            bottom: 18px;
+            color: #606978;
+            font-size: 1.7rem;
+            line-height: 1;
+        }
+
+        /* 六張卡片的淡色背景 */
+        .calendar-card {
+            background: #faf8ff;
+        }
+
+        .calendar-card .icon-wrap {
+            background: #eee9ff;
+        }
+
+        .month-card {
+            background: #f5fbf8;
+        }
+
+        .month-card .icon-wrap {
+            background: #e3f4eb;
+        }
+
+        .todo-card {
+            background: #fff8f5;
+        }
+
+        .todo-card .icon-wrap {
+            background: #ffe9e1;
+        }
+
+        .today-card {
+            background: #f5faff;
+        }
+
+        .today-card .icon-wrap {
+            background: #e2f0ff;
+        }
+
+        .study-card {
+            background: #fffbf0;
+        }
+
+        .study-card .icon-wrap {
+            background: #fff1bf;
+        }
+
+        .graduate-card {
+            background: #f8f7ff;
+        }
+
+        .graduate-card .icon-wrap {
+            background: #ebe8ff;
+        }
+
+        /* 手機較窄時稍微縮小 */
+        @media (max-width: 520px) {
+            .app {
+                padding: 36px 16px 28px;
+            }
+
+            .header {
+                margin-bottom: 26px;
+            }
+
+            .header-top {
+                align-items: flex-end;
+            }
+
+            .title {
+                font-size: 2.7rem;
+                letter-spacing: -1px;
+            }
+
+            .subtitle {
+                margin-top: 13px;
+                font-size: 0.9rem;
+            }
+
+            .date-box {
+                font-size: 0.8rem;
+            }
+
+            .date,
+            .weekday {
+                font-size: 0.78rem;
+            }
+
+            .menu-grid {
+                gap: 12px;
+            }
+
+            .menu-card {
+                min-height: 190px;
+                padding: 22px 12px 20px;
+                border-radius: 22px;
+            }
+
+            .icon-wrap {
+                width: 68px;
+                height: 68px;
+                margin-bottom: 18px;
+                font-size: 2rem;
+            }
+
+            .menu-card h2 {
+                font-size: 1.08rem;
+            }
+
+            .menu-card p {
+                padding: 0;
+                font-size: 0.76rem;
+            }
+
+            .arrow {
+                right: 14px;
+                bottom: 12px;
+                font-size: 1.35rem;
+            }
+        }
+
+        /* 非常窄的手機仍維持兩欄 */
+        @media (max-width: 360px) {
+            .app {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .title {
+                font-size: 2.2rem;
+            }
+
+            .menu-card {
+                min-height: 175px;
+            }
+
+            .menu-card p {
+                display: none;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>My Planner</h1>
-    <p>歡迎使用 My Planner！</p>
+    <main class="app">
+
+        <!-- 首頁標題 -->
+        <header class="header">
+            <div class="header-top">
+                <div>
+                    <h1 class="title">My Planner</h1>
+                    <p class="subtitle">
+                        把想做的事，慢慢變成日常。
+                    </p>
+                </div>
+
+                <div class="date-box">
+                    <div class="date" id="currentDate"></div>
+                    <div class="weekday" id="currentWeekday"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 六格功能入口 -->
+        <section class="menu-grid">
+
+            <!-- 左上：月曆 -->
+            <a
+                class="menu-card calendar-card"
+                href="calendar.html"
+                aria-label="前往月曆"
+            >
+                <div class="icon-wrap">📅</div>
+                <h2>月曆</h2>
+                <p>查看日期與行程</p>
+                <span class="arrow">›</span>
+            </a>
+
+            <!-- 右上：月規劃 -->
+            <a
+                class="menu-card month-card"
+                href="month-plan.html"
+                aria-label="前往月規劃"
+            >
+                <div class="icon-wrap">📋</div>
+                <h2>月規劃</h2>
+                <p>規劃整月的目標與計畫</p>
+                <span class="arrow">›</span>
+            </a>
+
+            <!-- 左中：To Do List -->
+            <a
+                class="menu-card todo-card"
+                href="todo.html"
+                aria-label="前往待辦事項"
+            >
+                <div class="icon-wrap">✅</div>
+                <h2>To Do List</h2>
+                <p>整理每日待辦事項</p>
+                <span class="arrow">›</span>
+            </a>
+
+            <!-- 右中：今日行程 -->
+            <a
+                class="menu-card today-card"
+                href="schedule.html"
+                aria-label="前往今日行程"
+            >
+                <div class="icon-wrap">🕒</div>
+                <h2>今日行程</h2>
+                <p>安排今天的時間</p>
+                <span class="arrow">›</span>
+            </a>
+
+            <!-- 左下：讀書規劃 -->
+            <a
+                class="menu-card study-card"
+                href="study-plan.html"
+                aria-label="前往讀書規劃"
+            >
+                <div class="icon-wrap">📖</div>
+                <h2>讀書規劃</h2>
+                <p>安排讀書計畫與進度</p>
+                <span class="arrow">›</span>
+            </a>
+
+            <!-- 右下：研究所進度 -->
+            <a
+                class="menu-card graduate-card"
+                href="graduate-progress.html"
+                aria-label="前往研究所進度"
+            >
+                <div class="icon-wrap">🎓</div>
+                <h2>研究所進度</h2>
+                <p>追蹤研究與重要里程碑</p>
+                <span class="arrow">›</span>
+            </a>
+
+        </section>
+    </main>
+
+    <script>
+        // 自動顯示今天日期
+        const now = new Date();
+
+        const dateFormatter = new Intl.DateTimeFormat("zh-TW", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        });
+
+        const weekdayFormatter = new Intl.DateTimeFormat("zh-TW", {
+            weekday: "long"
+        });
+
+        document.getElementById("currentDate").textContent =
+            dateFormatter.format(now);
+
+        document.getElementById("currentWeekday").textContent =
+            weekdayFormatter.format(now);
+    </script>
 </body>
 </html>
